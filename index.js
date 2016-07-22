@@ -2,6 +2,7 @@
 
 let filePath = __dirname + '/googlebooks-eng-all-2gram-20120701-ra';
 let yearFrom = '1960';
+let match = /horse/;
 
 let fs = require('fs');
 let async = require('async');
@@ -34,7 +35,12 @@ db.init(err => {
     if (!data){
       return;
     }
-    rows ++
+    if (++ rows % 10000 === 0){
+      console.log(`Done ${rows} rows`);
+    }
+    if (!data.match(match)){
+      return;
+    }
     let itemObj = getObj(data);
     if (
       itemObj.word1 === current.word1 &&
