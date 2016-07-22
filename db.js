@@ -1,9 +1,9 @@
 'use strict';
 
 let dbConfig = {
-  user: 'phelm',
-  database: 'phelm',
-  password: ' '
+  user: 'omg',
+  database: 'ngram2',
+  password: 'omg'
 };
 let table = 'ngram2'
 
