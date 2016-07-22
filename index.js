@@ -4,6 +4,8 @@ let filePath = __dirname + '/googlebooks-eng-all-2gram-20120701-ra';
 let yearFrom = '1960';
 let match = /horse/;
 
+let posreg = /_([A-Z]+)$/
+
 let fs = require('fs');
 let async = require('async');
 let split = require('split');
@@ -16,8 +18,28 @@ let getObj = (line) => {
   let out = {};
   let tabSplit = line.split('\t');
   let wordSplit = tabSplit[0].split('\x20');
-  out.word1 = wordSplit[0];
-  out.word2 = wordSplit[1];
+
+  let word1 = wordSplit[0];
+  let word1match = word1.match(posreg)
+  if (word1match){
+    out.word1 = word1.slice(0, word1match.index);
+    out.word1pos = word1match[1];
+  } else {
+    out.word1 = word1;
+    // out.word1pos = null;
+  }
+
+  let word2 = wordSplit[1];
+  let word2match = word2.match(posreg)
+  if (word2match){
+    out.word2 = word2.slice(0, word2match.index);
+    out.word2pos = word2match[1];
+  } else {
+    out.word2 = word2;
+    // out.word2pos = null;
+  }
+
+  out.ngramString = tabSplit[0];
   out.year  = parseInt(tabSplit[1]);
   out.count = parseInt(tabSplit[2]);
   return out;
@@ -35,26 +57,25 @@ db.init(err => {
     if (!data){
       return;
     }
-    if (++ rows % 10000 === 0){
+    if (++ rows % 10000000 === 0){
       console.log(`Done ${rows} rows`);
     }
     if (!data.match(match)){
       return;
     }
     let itemObj = getObj(data);
-    if (
-      itemObj.word1 === current.word1 &&
-      itemObj.word2 === current.word2
+    if ( // WORDS ARE THE SAME
+      itemObj.ngramString === current.ngramString
     ) {
       current.count += itemObj.count;
     } else {
-      if (current.word1 && current.word2 && current.count){
-        if (++dbQueries >= 10 && !paused){
+      if (current.ngramString){ // WORDS NOT EMPTY
+        if (++dbQueries >= 10 && !paused){ // max 10 concurrent
           paused = true;
           rs.pause();
         }
 
-        db.add(current.word1, current.word2, current.count, (err) => {
+        db.add(current, (err) => {
           if (++added % 10000 === 0){
             console.log(`ADDED ${added}, ROWS ${rows}, ${current.word1}`);
           }

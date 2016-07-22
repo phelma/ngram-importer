@@ -30,7 +30,9 @@ module.exports = {
           `CREATE TABLE IF NOT EXISTS ${table}(
             id SERIAL PRIMARY KEY,
             word1 TEXT,
+            word1pos TEXT,
             word2 TEXT,
+            word2pos TEXT,
             count INTEGER
           )`,
           (err) => {
@@ -56,7 +58,7 @@ module.exports = {
     )
   },
 
-  add(w1, w2, count, done){
+  add(ngram, done){
     async.waterfall([
       (cb) => {
         this.pool.connect((err, client, clientDone)=>{
@@ -64,8 +66,8 @@ module.exports = {
         })
       },
       (client, clientDone, cb) => {
-        let query = `INSERT INTO ${table} (word1, word2, count) VALUES ($1,$2,$3) RETURNING id`;
-        let vals = [w1, w2, count];
+        let query = `INSERT INTO ${table} (word1, word1pos, word2, word2pos, count) VALUES ($1,$2,$3, $4, $5) RETURNING id`;
+        let vals = [ngram.word1, ngram.word1pos, ngram.word2, ngram.word2pos, ngram.count];
         client.query(query, vals, (err, res) => {
           cb(err, client, clientDone);
         })
