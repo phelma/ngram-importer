@@ -47,12 +47,12 @@ module.exports = {
         )
       }],
       (err, clientDone) => {
-        clientDone();
         if (err){
           console.trace('[DB] FAILED', err);
         } else {
           console.log('[DB] INITIALISED');
         }
+        clientDone();
         initialized && initialized(err);
       }
     )

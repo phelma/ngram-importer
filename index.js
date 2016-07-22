@@ -1,6 +1,6 @@
 'use strict';
 
-let filePath = __dirname + '/googlebooks-eng-all-2gram-20120701-ra';
+let filePath = '/mnt/4TBC/google-ngrams/2/googlebooks-eng-all-2gram-20120701-ho';
 let yearFrom = '1960';
 let match = /horse/;
 
