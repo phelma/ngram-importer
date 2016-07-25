@@ -4,7 +4,7 @@ let filePath = __dirname + '/googlebooks-eng-all-2gram-20120701-ra';
 let yearFrom = '1960';
 let match = /horse/;
 
-let posreg = /_([A-Z]+)$/
+let posreg = /_([A-Z]+)_?$/
 
 let fs = require('fs');
 let async = require('async');
