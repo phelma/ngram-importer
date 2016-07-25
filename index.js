@@ -64,6 +64,9 @@ db.init(err => {
       return;
     }
     let itemObj = getObj(data);
+    if (itemObj.year < yearFrom){
+      return;
+    }
     if ( // WORDS ARE THE SAME
       itemObj.ngramString === current.ngramString
     ) {
