@@ -83,5 +83,30 @@ module.exports = {
 
   end(){
     this.pool.end();
+  },
+
+  getLast(done){
+    async.waterfall([
+      (cb) => {
+        this.pool.connect((err, client, clientDone) => {
+          cb(err, client, clientDone);
+        });
+      },
+      (client, clientDone, cb) => {
+        let query = `SELECT * FROM ${table} ORDER BY id DESC LIMIT 1`;
+        let vals = [];
+        client.query(query, vals, (err, res) => {
+          cb(err, res, clientDone);
+        })
+      }],
+      (err, res, clientDone) => {
+        clientDone();
+        if(err){
+          throw new Error(err);
+        }
+        let out = res.rows[0];
+        done(err, out);
+      }
+    )
   }
 };
