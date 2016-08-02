@@ -1,10 +1,11 @@
 'use strict';
 
-let filePath = '/mnt/4TBC/google-ngrams/2/azcat';
-let yearFrom = '1960';
-let match = /horse/;
+let config = require('./config');
+let filePath = config.filePath;
+let yearFrom = config.yearFrom;
+let match = new RegExp(config.match, 'i');
 
-let posreg = /_([A-Z]+)_?$/
+let posreg = new RegExp(config.posreg);
 
 let fs = require('fs');
 let async = require('async');

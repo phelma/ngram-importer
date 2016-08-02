@@ -1,0 +1,14 @@
+{
+  "db": {
+    "user": "omg",
+    "database": "ngram2",
+    "password": "omg",
+    "table": "ngram2full2"
+  },
+  "filePath": "/mnt/4TBC/google-ngrams/2/azcat",
+  "yearFrom": 1960,
+  "match": "horse",
+  "posreg": "_([A-Z]+)_?$",
+  "logInsertEvery": 10000,
+  "dbPool": 11
+}

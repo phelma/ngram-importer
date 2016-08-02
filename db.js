@@ -1,11 +1,10 @@
 'use strict';
 
-let dbConfig = {
-  user: 'omg',
-  database: 'ngram2',
-  password: 'omg'
-};
-let table = 'ngram2full2'
+let config = require('config');
+
+let dbConfig = config.db;
+
+let table = config.db.table;
 
 let pg = require('pg').native;
 let async = require('async');
