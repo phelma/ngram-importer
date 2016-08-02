@@ -7,7 +7,7 @@ let dbConfig = {
 };
 let table = 'ngram2full2'
 
-let pg = require('pg');
+let pg = require('pg').native;
 let async = require('async');
 
 module.exports = {
