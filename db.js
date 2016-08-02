@@ -5,7 +5,7 @@ let dbConfig = {
   database: 'ngram2',
   password: 'omg'
 };
-let table = 'ngram2'
+let table = 'ngram2full2'
 
 let pg = require('pg');
 let async = require('async');
@@ -33,7 +33,7 @@ module.exports = {
             word1pos TEXT,
             word2 TEXT,
             word2pos TEXT,
-            count INTEGER
+            count BIGINT
           )`,
           (err) => {
             if (err && err.message.indexOf('already exists') < 0){

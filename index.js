@@ -60,9 +60,10 @@ db.init(err => {
     if (++ rows % 10000000 === 0){
       console.log(`Done ${rows} rows`);
     }
-    if (!data.match(match)){
-      return;
-    }
+    // This would skip all entries that don't match horse
+    //if (!data.match(match)){
+    //  return;
+    //}
     let itemObj = getObj(data);
     if (itemObj.year < yearFrom){
       return;
