@@ -58,6 +58,9 @@ db.init(err => {
     if (!data){
       return;
     }
+    if (++ rows % 10000000 === 0){
+      console.log(`Done ${rows} rows`);
+    }
     let itemObj = getObj(data);
     if (itemObj.year < yearFrom){ // before cutoff year
       return;
@@ -68,7 +71,7 @@ db.init(err => {
       previous.count += itemObj.count;
     } else {
       if (previous.ngramString){ // WORDS NOT EMPTY
-        if (++dbQueries >= 10 && !paused){ // max 10 concurrent
+        if (++dbQueries >= config.dbPool && !paused){ // max 10 concurrent
           paused = true;
           rs.pause();
         }
@@ -84,8 +87,8 @@ db.init(err => {
             rs.resume();
           }
         });
-        previous = itemObj;
       }
+      previous = itemObj;
     }
   });
 
