@@ -1,6 +1,6 @@
 'use strict';
 
-let config = require('config');
+let config = require('./config');
 
 let dbConfig = config.db;
 
