@@ -47,7 +47,7 @@ let getObj = (line) => {
 }
 
 db.init(err => {
-  let current = {};
+  let previous = {};
   let added = 0;
   let rows = 0;
   let dbQueries = 0;
@@ -58,42 +58,33 @@ db.init(err => {
     if (!data){
       return;
     }
-    if (++ rows % 10000000 === 0){
-      console.log(`Done ${rows} rows`);
-    }
-    // This would skip all entries that don't match horse
-    //if (!data.match(match)){
-    //  return;
-    //}
     let itemObj = getObj(data);
-    if (itemObj.year < yearFrom){
+    if (itemObj.year < yearFrom){ // before cutoff year
       return;
     }
     if ( // WORDS ARE THE SAME
-      itemObj.ngramString === current.ngramString
+      itemObj.ngramString === previous.ngramString
     ) {
-      current.count += itemObj.count;
+      previous.count += itemObj.count;
     } else {
-      if (current.ngramString){ // WORDS NOT EMPTY
+      if (previous.ngramString){ // WORDS NOT EMPTY
         if (++dbQueries >= 10 && !paused){ // max 10 concurrent
           paused = true;
           rs.pause();
         }
 
-        db.add(current, (err) => {
-          if (++added % 10000 === 0){
-            console.log(`ADDED ${added}, ROWS ${rows}, ${current.word1}`);
+        db.add(previous, (err) => {
+          if (++added % config.logInsertEvery === 0){
+            console.log(`ADDED ${added}, ROWS ${rows}, ${previous.word1}`);
           }
           err && console.error(err);
-          current = itemObj;
 
-          if (--dbQueries < 10 && paused) {
+          if (--dbQueries < config.dbPool && paused) {
             paused = false;
             rs.resume();
           }
         });
-      } else {
-        current = itemObj;
+        previous = itemObj;
       }
     }
   });
