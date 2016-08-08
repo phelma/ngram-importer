@@ -12,7 +12,13 @@ let makeList = function(word) {
 
 db.init(function (err) {
   err && console.error(err);
-  let params = {};
+  let params = {
+    head: 'horse',
+    first: false,
+    headPos: headPos,
+    modPos: modPos,
+    count: 20
+  };
   db.getWords(params, function(err, res) {
     err && console.error(err);
     res.forEach(function (row) {
