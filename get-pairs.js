@@ -1,7 +1,7 @@
 'use strict';
 let count = 100;
 let inputFile = `${__dirname}/vocab.csv`;
-let outputFile = `${__dirname}/out-${Date.now()}.csv`;
+let outputFile = `${__dirname}/out/${Date.now()}.csv`;
 
 let config = require('./config');
 let db = require('./db');
