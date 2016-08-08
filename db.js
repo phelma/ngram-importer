@@ -7,8 +7,14 @@ let dbConfig = config.db;
 let table = config.db.table;
 
 let assert = require('assert');
-let pg = require('pg').native;
+let pg;
+if (config.native){
+  pg = require('pg').native;
+} else {
+  pg = require('pg');
+}
 let async = require('async');
+let knex = require('knex')({client: 'pg'});
 
 let capitalizeFirstLetter = (string) => {
  return string.charAt(0).toUpperCase() + string.slice(1);
@@ -117,27 +123,36 @@ module.exports = {
   getWords(params, done){
     // params = {head, first, headPos, modPos, count}
     let head = params.head.trim().toLowerCase();
-    assert(head.split(' ').length === 1, 'params.head must only be 1 word');
+    if (head.split(' ').length > 1){
+      console.warn('skipping, more than 1 word');
+      done([]);
+      return;
+    }
 
     let headCap = capitalizeFirstLetter(head);
 
-    let queryVals = [];
-    let queryStr = 'SELECT word1, word2 FROM $1 ';
-    queryStr += 'WHERE ';
-
+    let query = knex
+      .select(['word1', 'word1pos', 'word2', 'word2pos', 'count'])
+      .from(table)
+      .whereNotNull('word1')
+      .whereNotNull('word2')
+      .whereNot({
+        word1: '',
+        word2: ''
+      })
     if (!params.first){
-      queryStr += 'word2 IN $2 AND ';
-      queryStr += 'word2pos IN $3 AND ';
-      queryStr += 'word1pos IN $4 ';
+      query = query.whereIn('word2', [head, headCap])
+      // .whereIn('word2pos', params.headPos)
+      .whereIn('word1pos', params.modPos)
     } else {
-      queryStr += 'word1 IN $2 AND ';
-      queryStr += 'word1pos IN $3 AND ';
-      queryStr += 'word2pos IN $4 ';
+      query = query.whereIn('word1', [head, headCap])
+      // .whereIn('word1pos', params.headPos)
+      .whereIn('word2pos', params.modPos)
     }
-    queryStr += 'ORDER BY count DESC ';
-    queryStr += 'LIMIT $5;';
 
-    queryVals = [table, [head, headCap], params.headPos, params.modPos, params.count];
+    query = query.orderBy('count', 'desc')
+      .limit(params.count)
+      .toString();
 
     async.waterfall([
       (cb) => {
@@ -147,12 +162,16 @@ module.exports = {
       },
 
       (client, clientDone, cb) => {
-        client.query(queryStr, queryVals, (err, res) => {
-          cb(err, res, clientDone);
-        })
+        client.query(
+          query,
+          (err, res) => {
+            cb(err, res, clientDone);
+          })
       }
+
     ], (err, res, clientDone) => {
       clientDone();
+      err && console.error(err);
       done(err, res.rows);
     })
   }
